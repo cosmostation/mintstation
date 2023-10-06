@@ -130,7 +130,7 @@ import (
 
 const (
 	AccountAddressPrefix = "mint"
-	Name                 = "github.com/cosmostation/mintstation"
+	Name                 = "mintstation"
 )
 
 var (
