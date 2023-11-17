@@ -1,0 +1,12 @@
+syntax = "proto3";
+package mintstation.mns;
+
+option go_package = "github.com/cosmostation/mintstation/x/mns/types";
+
+message Ownership {
+  string index = 1; 
+  string name = 2; 
+  string owner = 3; 
+  
+}
+
