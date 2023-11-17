@@ -28,6 +28,12 @@ service Query {
     option (google.api.http).get = "/cosmostation/mintstation/mns/ownership";
   
   }
+  
+  // Queries a list of Find items.
+  rpc Find (QueryFindRequest) returns (QueryFindResponse) {
+    option (google.api.http).get = "/cosmostation/mintstation/mns/find";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -54,5 +60,13 @@ message QueryAllOwnershipRequest {
 message QueryAllOwnershipResponse {
   repeated Ownership                              ownership  = 1 [(gogoproto.nullable) = false];
            cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryFindRequest {
+  string owner = 1;
+}
+
+message QueryFindResponse {
+  Ownership ownership = 1 [(gogoproto.nullable) = false];
 }
 

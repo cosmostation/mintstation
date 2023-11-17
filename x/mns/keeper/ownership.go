@@ -34,6 +34,28 @@ func (k Keeper) GetOwnership(
 	return val, true
 }
 
+// FindOwnership returns a ownership by owner
+func (k Keeper) FindOwnership(
+	ctx sdk.Context,
+	address string,
+) (val types.Ownership, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.OwnershipKeyPrefix))
+
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.Ownership
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		if val.Owner == address {
+			return val, true
+		}
+	}
+
+	return val, false
+}
+
 // RemoveOwnership removes a ownership from the store
 func (k Keeper) RemoveOwnership(
 	ctx sdk.Context,

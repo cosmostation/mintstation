@@ -49489,6 +49489,50 @@ paths:
                         }
       tags:
         - Query
+  /cosmostation/mintstation/mns/find:
+    get:
+      summary: Queries a list of Find items.
+      operationId: MintstationMnsFind
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              ownership:
+                type: object
+                properties:
+                  index:
+                    type: string
+                  name:
+                    type: string
+                  owner:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: owner
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
   /cosmostation/mintstation/mns/ownership:
     get:
       operationId: MintstationMnsOwnershipAll
@@ -79434,6 +79478,18 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
+  mintstation.mns.QueryFindResponse:
+    type: object
+    properties:
+      ownership:
+        type: object
+        properties:
+          index:
+            type: string
+          name:
+            type: string
+          owner:
+            type: string
   mintstation.mns.QueryGetOwnershipResponse:
     type: object
     properties:

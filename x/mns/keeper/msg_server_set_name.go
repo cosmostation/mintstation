@@ -15,8 +15,10 @@ func (k msgServer) SetName(goCtx context.Context, msg *types.MsgSetName) (*types
 	_, isFound := k.GetOwnership(ctx, msg.Name)
 	caller, _ := sdk.AccAddressFromBech32(msg.Creator)
 
+	_, isFoundByName := k.FindOwnership(ctx, caller.String())
+
 	// If a name is found in store
-	if isFound {
+	if isFound || isFoundByName {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "Already has ownership")
 	}
 
