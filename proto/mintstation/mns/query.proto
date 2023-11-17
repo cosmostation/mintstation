@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package mintstation.mns;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "mintstation/mns/params.proto";
+import "mintstation/mns/ownership.proto";
+
+option go_package = "github.com/cosmostation/mintstation/x/mns/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  
+  // Parameters queries the parameters of the module.
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/cosmostation/mintstation/mns/params";
+  
+  }
+  
+  // Queries a list of Ownership items.
+  rpc Ownership    (QueryGetOwnershipRequest) returns (QueryGetOwnershipResponse) {
+    option (google.api.http).get = "/cosmostation/mintstation/mns/ownership/{index}";
+  
+  }
+  rpc OwnershipAll (QueryAllOwnershipRequest) returns (QueryAllOwnershipResponse) {
+    option (google.api.http).get = "/cosmostation/mintstation/mns/ownership";
+  
+  }
+}
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetOwnershipRequest {
+  string index = 1;
+}
+
+message QueryGetOwnershipResponse {
+  Ownership ownership = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllOwnershipRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllOwnershipResponse {
+  repeated Ownership                              ownership  = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package mintstation.mns;
+
+option go_package = "github.com/cosmostation/mintstation/x/mns/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc SetName    (MsgSetName   ) returns (MsgSetNameResponse   );
+  rpc DeleteName (MsgDeleteName) returns (MsgDeleteNameResponse);
+}
+message MsgSetName {
+  string creator = 1;
+  string name    = 2;
+}
+
+message MsgSetNameResponse {}
+
+message MsgDeleteName {
+  string creator = 1;
+  string name    = 2;
+}
+
+message MsgDeleteNameResponse {}
+
