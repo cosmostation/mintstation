@@ -125,6 +125,7 @@ import (
 	mnsmodule "github.com/cosmostation/mintstation/x/mns"
 	mnsmodulekeeper "github.com/cosmostation/mintstation/x/mns/keeper"
 	mnsmoduletypes "github.com/cosmostation/mintstation/x/mns/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/cosmostation/mintstation/app/params"
@@ -804,6 +805,7 @@ func New(
 	app.mm.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
+	app.setupUpgradeHandlers(appOpts)
 
 	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.mm.Modules))
 	reflectionSvc, err := runtimeservices.NewReflectionService()
