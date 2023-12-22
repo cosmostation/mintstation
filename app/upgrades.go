@@ -7,7 +7,9 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v003 "github.com/cosmostation/mintstation/app/upgrades/v003"
+	v004 "github.com/cosmostation/mintstation/app/upgrades/v004"
 	mnsmoduletypes "github.com/cosmostation/mintstation/x/mns/types"
+	tokenfactorytypes "github.com/cosmostation/mintstation/x/tokenfactory/types"
 )
 
 func (app *App) setupUpgradeHandlers(appOpts servertypes.AppOptions) {
@@ -16,6 +18,15 @@ func (app *App) setupUpgradeHandlers(appOpts servertypes.AppOptions) {
 		v003.UpgradeName,
 		v003.CreateUpgradeHandler(
 			app.mm,
+			app.configurator,
+		),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v004.UpgradeName,
+		v004.CreateUpgradeHandler(
+			app.mm,
+			app.TokenFactoryKeeper,
 			app.configurator,
 		),
 	)
@@ -35,6 +46,10 @@ func (app *App) setupUpgradeHandlers(appOpts servertypes.AppOptions) {
 	case "v0.0.3":
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{mnsmoduletypes.StoreKey},
+		}
+	case "v0.0.4":
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{tokenfactorytypes.StoreKey},
 		}
 	}
 

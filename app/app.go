@@ -122,6 +122,11 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
+	tokenfactory "github.com/cosmostation/mintstation/x/tokenfactory"
+	tokenbindings "github.com/cosmostation/mintstation/x/tokenfactory/bindings"
+	tokenfactorykeeper "github.com/cosmostation/mintstation/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/cosmostation/mintstation/x/tokenfactory/types"
+
 	mnsmodule "github.com/cosmostation/mintstation/x/mns"
 	mnsmodulekeeper "github.com/cosmostation/mintstation/x/mns/keeper"
 	mnsmoduletypes "github.com/cosmostation/mintstation/x/mns/types"
@@ -219,6 +224,7 @@ var (
 		vesting.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		mnsmodule.AppModuleBasic{},
+		tokenfactory.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -233,6 +239,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
+		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -300,7 +307,8 @@ type App struct {
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
-	MnsKeeper mnsmodulekeeper.Keeper
+	MnsKeeper          mnsmodulekeeper.Keeper
+	TokenFactoryKeeper tokenfactorykeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -354,6 +362,7 @@ func New(
 		capabilitytypes.StoreKey, group.StoreKey, icacontrollertypes.StoreKey, consensusparamtypes.StoreKey,
 		wasm.StoreKey,
 		mnsmoduletypes.StoreKey,
+		tokenfactorytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -551,6 +560,23 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
+		appCodec,
+		app.keys[tokenfactorytypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
+		[]string{
+			tokenfactorytypes.EnableBurnFrom,
+			tokenfactorytypes.EnableForceTransfer,
+			tokenfactorytypes.EnableSetMetadata,
+		},
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	tfOpts := tokenbindings.RegisterCustomPlugins(app.BankKeeper, &app.TokenFactoryKeeper)
+	wasmOpts = append(wasmOpts, tfOpts...)
+
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
@@ -704,6 +730,7 @@ func New(
 		// this line is used by starport scaffolding # stargate/app/appModule
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
+		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(tokenfactorytypes.ModuleName)),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -735,6 +762,7 @@ func New(
 		consensusparamtypes.ModuleName,
 		wasm.ModuleName,
 		mnsmoduletypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -762,6 +790,7 @@ func New(
 		consensusparamtypes.ModuleName,
 		wasm.ModuleName,
 		mnsmoduletypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -794,6 +823,7 @@ func New(
 		consensusparamtypes.ModuleName,
 		wasm.ModuleName,
 		mnsmoduletypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)

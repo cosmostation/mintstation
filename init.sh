@@ -17,9 +17,9 @@ mintstationd keys add validator
  
 MY_VALIDATOR_ADDRESS=$(mintstationd keys show validator -a)
  
-mintstationd add-genesis-account $MY_VALIDATOR_ADDRESS 10000000000umint
+mintstationd add-genesis-account $MY_VALIDATOR_ADDRESS 1000000000000000000000umint
  
-mintstationd gentx validator 10000000umint --chain-id localnet-1
+mintstationd gentx validator 10000000000000umint --chain-id localnet-1
  
 mintstationd collect-gentxs
  
